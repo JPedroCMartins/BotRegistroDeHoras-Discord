@@ -1,0 +1,60 @@
+body {
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: none;
+}
+
+.user-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.user-card:hover {
+    background-color: #f8f9fa;
+    border-left: 4px solid #adb5bd;
+}
+
+.list-group-item.active {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    border-left: 4px solid #0d6efd;
+    color: #212529;
+}
+
+th.sortable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+}
+
+th.sortable:hover {
+    background-color: #e2e6ea;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 15px;
+    color: #6c757d;
+}
+
+.search-box input {
+    padding-left: 40px;
+    border-radius: 20px;
+}

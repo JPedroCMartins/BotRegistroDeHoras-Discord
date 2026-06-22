@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Controle de Ponto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="text-primary fw-bold"><i class="bi bi-stopwatch"></i> Dashboard de Ponto</h2>
+            <p class="text-muted mb-0">Acompanhamento interativo dos registros.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Coluna da Lista de Usuários -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white pt-4 pb-0">
+                    <h5 class="card-title fw-bold text-dark mb-3">Equipe</h5>
+                    <!-- Campo de Busca -->
+                    <div class="search-box mb-3">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="inputBusca" class="form-control bg-light border-0" placeholder="Buscar..." onkeyup="filtrarUsuarios()">
+                    </div>
+                </div>
+                <div class="list-group list-group-flush rounded-bottom" id="lista-usuarios">
+                    {% if not usuarios %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-inbox fs-2"></i>
+                            <p class="mt-2 mb-0">Nenhum registro encontrado.</p>
+                        </div>
+                    {% else %}
+                        {% for uid, user in usuarios.items() %}
+                        <button onclick="mostrarRegistros('{{ uid }}', this)" class="list-group-item list-group-item-action user-card py-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <h6 class="mb-1 fw-bold nome-usuario">{{ user.apelido }}</h6>
+                                {% if user.em_andamento %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1"><i class="bi bi-record-circle text-danger me-1"></i>Trabalhando</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted"><i class="bi bi-clock-history me-1"></i>Total Acumulado: <strong>{{ user.total_formatado }}</strong></small>
+                        </button>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna dos Registros -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    
+                    <!-- Mensagem Inicial -->
+                    <div id="mensagem-inicial" class="h-100 d-flex flex-column justify-content-center align-items-center text-muted" style="min-height: 300px;">
+                        <i class="bi bi-person-lines-fill fs-1 mb-3 text-secondary"></i>
+                        <h4>Selecione um usuário</h4>
+                        <p>Clique em um nome na lista ao lado para visualizar o histórico detalhado.</p>
+                    </div>
+
+                    <!-- Tabelas de Dados (Geradas dinamicamente) -->
+                    {% for uid, user in usuarios.items() %}
+                    <div id="dados-{{ uid }}" class="d-none container-registros">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-bold mb-0 text-dark">Histórico de <span class="text-primary">{{ user.apelido }}</span></h4>
+                            <span class="badge bg-light text-dark border"><i class="bi bi-info-circle me-1"></i>Clique nos cabeçalhos para ordenar</span>
+                        </div>
+                        
+                        <div class="table-responsive rounded border">
+                            <table class="table table-hover align-middle mb-0" id="tabela-{{ uid }}">
+                                <thead class="table-light">
+                                    <tr>
+                                        <!-- Adicionado onclick para ordenação -->
+                                        <th class="sortable" onclick="ordenarTabela('tabela-{{ uid }}', 0)">Data <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                                        <th class="sortable" onclick="ordenarTabela('tabela-{{ uid }}', 1)">Entrada <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                                        <th class="sortable" onclick="ordenarTabela('tabela-{{ uid }}', 2)">Saída <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                                        <th class="sortable" onclick="ordenarTabela('tabela-{{ uid }}', 3)">Total <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                                        <th>Observação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in user.registros %}
+                                    <tr>
+                                        <td><strong>{{ r.data }}</strong></td>
+                                        <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2"><i class="bi bi-box-arrow-in-right me-1"></i>{{ r.entrada }}</span></td>
+                                        <td>
+                                            {% if r.saida == 'aberto' %}
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2"><i class="bi bi-hourglass-split me-1"></i>Em andamento</span>
+                                            {% else %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2"><i class="bi bi-box-arrow-left me-1"></i>{{ r.saida }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="fw-medium text-secondary">{{ r.total }}</td>
+                                        <td><small class="text-muted">{{ r.observacao }}</small></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (Opcional, para tooltips ou modais futuros) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Script Personalizado -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
