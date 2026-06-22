@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from .database import SessionLocal, Registro, agora, formatar_dt, formatar_duracao
+from ..database.database import SessionLocal, Registro, agora, formatar_dt, formatar_duracao
 from .config import Config
 from . import comandos
 
