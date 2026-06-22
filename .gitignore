@@ -6,5 +6,9 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
+# environment files
 .venv
+.env
+
+# database files
+ponto.db
