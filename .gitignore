@@ -12,3 +12,6 @@ wheels/
 
 # database files
 ponto.db
+
+# database backup files
+*.bak
